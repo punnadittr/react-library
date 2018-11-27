@@ -7,9 +7,9 @@ const Rating = props => {
   const { rating } = props;
   for (let i = 0; i < 5; i++) {
     if (i < rating) {
-      stars.push(<FontAwesomeIcon className="checked" icon={faStar} />);
+      stars.push(<FontAwesomeIcon key={i} className="checked" icon={faStar} />);
     } else {
-      stars.push(<FontAwesomeIcon icon={faStar} />);
+      stars.push(<FontAwesomeIcon key={i} icon={faStar} />);
     }
   }
   return <span title={`This book has ${rating} stars`}>{stars}</span>;

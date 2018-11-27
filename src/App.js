@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
-import BookList from './Table';
-import { ReadButton } from './Button';
-import Rating from './Rating';
-import { TableRow, TableCell, TableHead } from '@material-ui/core';
+import BookListTable from './Table';
+import Navbar from './Navbar';
+
+window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 
 const bookList = [
   {
@@ -39,15 +39,48 @@ class App extends Component {
       bookList
     };
 
-    this.clickHandler = this.clickHandler.bind(this);
+    this.changeReadStatus = this.changeReadStatus.bind(this);
+    this.onDissmiss = this.onDissmiss.bind(this);
+    this.handleSubmitBook = this.handleSubmitBook.bind(this);
   }
 
-  clickHandler(elemID) {
+  changeReadStatus(elemID) {
     // Create a copy of booklist array
     const bookList = this.state.bookList.slice();
-    // find the book that we will change its read value
+    // Find the book that we will change its read value
     const changingBook = bookList.find(book => book.objectID === elemID);
     changingBook.read = !changingBook.read;
+    this.setState({ bookList });
+  }
+
+  onDissmiss(elemID) {
+    const { bookList } = this.state;
+    const updatedBookList = bookList.filter(book => book.objectID !== elemID);
+    this.setState({ bookList: updatedBookList });
+  }
+
+  // Find the highest ID to apply in creating new books
+  highestBookID() {
+    const { bookList } = this.state;
+    const result = Math.max(...bookList.map(book => book.objectID));
+    if (result === -Infinity) {
+      return 0;
+    }
+    return result;
+  }
+
+  handleSubmitBook(book) {
+    const bookList = this.state.bookList.slice();
+    const newBook = {
+      title: book.title,
+      description: book.description,
+      author: book.author,
+      rating: book.rating,
+      read: false,
+      // To avoid duplicate ID, it will find the highest book ID then plus one
+      objectID: this.highestBookID() + 1
+    };
+    bookList.push(newBook);
     this.setState({ bookList });
   }
 
@@ -55,29 +88,13 @@ class App extends Component {
     const { bookList } = this.state;
     return (
       <div className="library container">
-        <h1 className="text-center display-2">Library</h1>
-        <div className="mt-5 book-table">
-          <BookList>
-            {bookList.map((book, index) => (
-              <TableRow key={book.objectID}>
-                <TableCell component="th" scope="row">
-                  {index + 1}
-                </TableCell>
-                <TableCell>{book.title}</TableCell>
-                <TableCell>{book.description}</TableCell>
-                <TableCell>{book.author}</TableCell>
-                <TableCell>
-                  <Rating rating={book.rating} />
-                </TableCell>
-                <TableCell>
-                  <ReadButton
-                    onClick={() => this.clickHandler(book.objectID)}
-                    isRead={book.read}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </BookList>
+        <Navbar appName="Library" onBookCreate={this.handleSubmitBook} />
+        <div className="book-table">
+          <BookListTable
+            bookList={bookList}
+            changeReadStatus={this.changeReadStatus}
+            onDissmiss={this.onDissmiss}
+          />
         </div>
       </div>
     );

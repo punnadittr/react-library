@@ -5,3 +5,13 @@
 .checked {
   color: orange;
 }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:visited {
+  color: inherit;
+  text-decoration: none;
+}
